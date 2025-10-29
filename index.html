@@ -5,51 +5,148 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Prueba de Humo - Sistema de Login</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Pequeñas clases auxiliares sin tocar tu style.css principal */
+    .hidden { display: none !important; }
+    .center { text-align: center; }
+    .btn-link {
+      background: transparent;
+      border: none;
+      color: #0984e3;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 0;
+    }
+    .modal-box {
+      background: #fff;
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    .form-row { margin-bottom: 12px; }
+    .small-muted { color: #636e72; font-size: 13px; }
+    .msg { font-weight: 700; margin-top: 10px; }
+    .msg.success { color: #00b894; }
+    .msg.error { color: #d63031; }
+    /* Si tu style.css ya define .container, h1, inputs, botones, etc. se mantendrán */
+  </style>
 </head>
 <body>
   <div class="container">
-    <h1>🔍 Prueba de Humo</h1>
-    <p>Verifica el funcionamiento básico del sistema de inicio de sesión.</p>
 
-    <form id="loginForm">
-      <div class="form-group">
-        <label for="usuario">Usuario</label>
-        <input type="text" id="usuario" placeholder="Ingresa tu usuario" required>
+    <!-- VISTA: LOGIN (igual que la que pegaste) -->
+    <div id="view-login">
+      <h1>🔍 Prueba de Humo</h1>
+      <p>Verifica el funcionamiento básico del sistema de inicio de sesión.</p>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="usuario">Usuario</label>
+          <input type="text" id="usuario" placeholder="Ingresa tu usuario" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
+        </div>
+
+        <button type="submit">Iniciar Sesión</button>
+      </form>
+
+      <p id="mensaje"></p>
+
+      <div style="margin-top:12px; display:flex; gap:8px; justify-content:center;">
+        <button id="forgotBtn" class="btn-link" type="button">Olvidé mi contraseña</button>
+        <button id="logoutBtn" class="hidden">Cerrar Sesión</button>
       </div>
 
-      <div class="form-group">
-        <label for="password">Contraseña</label>
-        <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
+      <footer style="margin-top:18px;">
+        <p>📘 Simulación de prueba de humo | Universidad del Valle de Guatemala 2025</p>
+      </footer>
+    </div>
+
+    <!-- VISTA: RECUPERACIÓN DE CONTRASEÑA -->
+    <div id="view-recover" class="hidden">
+      <div class="modal-box">
+        <h2 class="center">🔐 Recuperar contraseña</h2>
+        <p class="small-muted center">Introduce el usuario y el número de teléfono asociados para recuperar la contraseña.</p>
+
+        <form id="recoverForm">
+          <div class="form-row">
+            <label for="recUser">Usuario</label>
+            <input id="recUser" type="text" placeholder="Ej: Jomario17" required>
+          </div>
+
+          <div class="form-row">
+            <label for="recPhone">Teléfono</label>
+            <input id="recPhone" type="tel" placeholder="Ej: 56514661" required>
+          </div>
+
+          <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:8px;">
+            <button id="backToLogin" type="button" class="btn-link">Volver</button>
+            <button id="recoverBtn" type="submit">Recuperar</button>
+          </div>
+
+          <div id="recoverMsg" class="msg"></div>
+
+          <div style="margin-top:12px" class="small-muted center">
+            <strong>Datos de prueba (quemados)</strong><br>
+            Propietario: Mario Sosa • Usuario: <code>Jomario17</code> • Tel: <code>56514661</code>
+          </div>
+        </form>
       </div>
+    </div>
 
-      <button type="submit">Iniciar Sesión</button>
-    </form>
-
-    <p id="mensaje"></p>
-
-    <button id="logoutBtn" class="hidden">Cerrar Sesión</button>
-
-    <footer>
-      <p>📘 Simulación de prueba de humo | Universidad del Valle de guatemala 2025</p>
-    </footer>
   </div>
 
   <script>
-    const form = document.getElementById('loginForm');
+    // Datos quemados para la prueba (no usar en producción)
+    const BOSS = { nombre: "Mario Sosa", usuario: "Jomario17", telefono: "56514551", password: "miPass2025" };
+
+    // Elementos
+    const viewLogin = document.getElementById('view-login');
+    const viewRecover = document.getElementById('view-recover');
+
+    const loginForm = document.getElementById('loginForm');
     const mensaje = document.getElementById('mensaje');
     const logoutBtn = document.getElementById('logoutBtn');
+    const forgotBtn = document.getElementById('forgotBtn');
 
-    form.addEventListener('submit', (e) => {
+    const recoverForm = document.getElementById('recoverForm');
+    const recoverMsg = document.getElementById('recoverMsg');
+    const backToLogin = document.getElementById('backToLogin');
+
+    // Mostrar pantalla de recuperación
+    forgotBtn.addEventListener('click', () => {
+      viewLogin.classList.add('hidden');
+      viewRecover.classList.remove('hidden');
+      // limpiar mensajes y campos
+      recoverMsg.textContent = '';
+      document.getElementById('recUser').value = '';
+      document.getElementById('recPhone').value = '';
+    });
+
+    // Volver al login
+    backToLogin.addEventListener('click', () => {
+      viewRecover.classList.add('hidden');
+      viewLogin.classList.remove('hidden');
+      mensaje.textContent = '';
+    });
+
+    // Login (mantiene comportamiento original)
+    loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
-      const usuario = document.getElementById('usuario').value;
+      const usuario = document.getElementById('usuario').value.trim();
       const password = document.getElementById('password').value;
 
-      // Caso correcto
+      // Caso correcto (igual que antes)
       if (usuario === "admin" && password === "1234") {
         mensaje.textContent = "✅ Inicio de sesión exitoso. Sistema estable.";
         mensaje.className = "success";
-        form.classList.add("hidden");
+        loginForm.classList.add("hidden");
         logoutBtn.classList.remove("hidden");
       } else {
         // Caso erróneo
@@ -58,13 +155,30 @@
       }
     });
 
+    // Logout (igual que antes)
     logoutBtn.addEventListener('click', () => {
       mensaje.textContent = "👋 Sesión cerrada correctamente.";
       mensaje.className = "success";
-      form.reset();
-      form.classList.remove("hidden");
+      loginForm.reset();
+      loginForm.classList.remove("hidden");
       logoutBtn.classList.add("hidden");
     });
+
+    // Recuperación de contraseña (comportamiento simple)
+    recoverForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const inputU = document.getElementById('recUser').value.trim();
+      const inputPhone = document.getElementById('recPhone').value.trim();
+
+      if (inputU === BOSS.usuario && inputPhone === BOSS.telefono) {
+        recoverMsg.textContent = "✅ Usuario verificado. Contraseña: " + BOSS.password;
+        recoverMsg.className = "msg success";
+      } else {
+        recoverMsg.textContent = "❌ No se pudo verificar el usuario/telefono. Recuperación fallida.";
+        recoverMsg.className = "msg error";
+      }
+    });
+
   </script>
 </body>
 </html>
