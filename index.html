@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prueba de Humo - Sistema de Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Prueba de Humo</h1>
+    <p>Verifica el funcionamiento básico del sistema de inicio de sesión.</p>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="usuario">Usuario</label>
+        <input type="text" id="usuario" placeholder="Ingresa tu usuario" required>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
+      </div>
+
+      <button type="submit">Iniciar Sesión</button>
+    </form>
+
+    <p id="mensaje"></p>
+
+    <button id="logoutBtn" class="hidden">Cerrar Sesión</button>
+
+    <footer>
+      <p>📘 Simulación de prueba de humo | Universidad del Valle de guatemala 2025</p>
+    </footer>
+  </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const mensaje = document.getElementById('mensaje');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const usuario = document.getElementById('usuario').value;
+      const password = document.getElementById('password').value;
+
+      // Caso correcto
+      if (usuario === "admin" && password === "1234") {
+        mensaje.textContent = "✅ Inicio de sesión exitoso. Sistema estable.";
+        mensaje.className = "success";
+        form.classList.add("hidden");
+        logoutBtn.classList.remove("hidden");
+      } else {
+        // Caso erróneo
+        mensaje.textContent = "❌ Error: Credenciales incorrectas o fallo del sistema.";
+        mensaje.className = "error";
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      mensaje.textContent = "👋 Sesión cerrada correctamente.";
+      mensaje.className = "success";
+      form.reset();
+      form.classList.remove("hidden");
+      logoutBtn.classList.add("hidden");
+    });
+  </script>
+</body>
+</html>
